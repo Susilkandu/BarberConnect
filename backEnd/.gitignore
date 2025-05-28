@@ -1,5 +1,0 @@
-node_modules/
-../files/
-src/config/env.js
-.env
-../server.log

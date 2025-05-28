@@ -1,0 +1,10 @@
+# igonring backend confedential and unnecessary resources
+server.log
+file/
+backend/node_modules
+backend/src/config/env.js
+backend/.env
+
+# ignoreing fronten confedential and unnecessary resources
+frontEnd/node_modules/
+frontEnd/dist/
