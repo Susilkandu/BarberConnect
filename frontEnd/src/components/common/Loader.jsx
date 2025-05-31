@@ -17,7 +17,7 @@ const Loader = () => {
   return (
     <AnimatePresence>
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-[#000000bb]"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#000000bb] "
           variants={backdropVariants}
           initial="initial"
           animate="animate"

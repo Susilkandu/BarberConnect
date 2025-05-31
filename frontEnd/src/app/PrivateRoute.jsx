@@ -7,11 +7,6 @@ const PrivateRoute = ({ children, requiredRole }) => {
   if (!role) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
-  console.log("Current role from Redux :", role);
-  console.log("Required role:", requiredRole);
-  setTimeout(()=>{
-    console.log(role)
-  },4000)
   if (requiredRole && requiredRole !== role ){
     return <Navigate to="/" replace />;
   }

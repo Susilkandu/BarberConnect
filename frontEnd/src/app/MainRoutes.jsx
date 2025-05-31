@@ -37,13 +37,13 @@ export default function MainRoutes() {
           dispatch(setLoading({loading:true}));
           const res = await barberService.getProfile();
           dispatch(loginSuccess({role:"barber",isAuthenticated:true}));
-          dispatch(setProfile(res.data[0]));
+          dispatch(setProfile(res.data.data[0]));
           navigate('/barber');
         }
         if(Cookies.get('customerToken')){
           dispatch(setLoading({loading:true}));
           // const res = await barberService.getProfile();
-          dispatch(loginSuccess({role:"barber",isAuthenticated:true}));
+          dispatch(loginSuccess({role:"customer",isAuthenticated:true}));
           // dispatch(setProfile(res.data[0]));
           navigate('/customer');
         }

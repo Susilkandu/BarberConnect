@@ -1,7 +1,9 @@
 import authServices from './authService';
-// import customerService from './customerService';
+import customerServices from './customerServices';
+import profileServices from './profileService';
 
 export{
     authServices,
-    // customerService
+    customerServices,
+    profileServices
 }

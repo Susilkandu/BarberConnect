@@ -11,7 +11,7 @@ const {validateEmail, validateVerificationDetails, validateBasicInfo, validateDo
 } = require("../validators/customerValidator");
 
 //controller
-const {sendOtpOnEmailForReg, getRegistrationStep, verifyOtpForReg, saveBasicInfoFoReg, saveDobPsdAndLctnForReg, loginViaCredential, sendOtpToResetPsd,
+const {sendOtpOnEmailForReg,resendOtpOnEmailForReg, getRegistrationStep, verifyOtpForReg, saveBasicInfoFoReg, saveDobPsdAndLctnForReg, loginViaCredential, sendOtpToResetPsd,
     verifyOtpAndUpdatePass, getProfile, changeProfilePhoto, updateProfile
 } = require("../controller/customerController");
 
@@ -21,7 +21,7 @@ const { uploadPhoto } = require("../../../core/utils/fileUploader");
 
 
 try {
-    router.post('/sendOtpOnEmail', validateEmail, runValidation, sendOtpOnEmailForReg);
+    router.post('/sendOtpOnEmailForReg', validateEmail, runValidation, sendOtpOnEmailForReg);
     router.get('/getRegistrationStep', requireCustomerLogin ,getRegistrationStep);
     router.post('/verifyOtpForReg', validateVerificationDetails, runValidation, verifyOtpForReg);
     router.patch('/saveBasicInfoForReg',requireCustomerLogin, validateBasicInfo, runValidation, saveBasicInfoFoReg);

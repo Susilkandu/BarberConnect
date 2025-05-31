@@ -1,8 +1,8 @@
 const ErrorHandler = require("../../../core/middlewares/errors/errorHandler");
 const catchAsyncError = require("../../../core/middlewares/errors/catchAsyncError");
 
-const {sendOtpOnEmailForCustomer, verifyOtpForCustomer, saveNameGenderPhone, saveDobPsdLctn, login, sendOtpToEmailForResetPsd,
-  updatePassword, fetchProfile, uploadNewProfilePhoto, updateCustomerProfile
+const {sendOtpOnEmailForCustomer, resenOtpForCustomer, verifyOtpForCustomer, saveNameGenderPhone, saveDobPsdLctn, login, sendOtpToEmailForResetPsd,
+  updatePassword, fetchProfile, uploadNewProfilePhoto, updateCustomerProfile,
 } = require("../services/customerServices");
 
 // controller for sending otp on the email for registration
@@ -118,22 +118,29 @@ const changeProfilePhoto = catchAsyncError(async (req, res, next) => {
   return res.status(200).json(data);
 });
 
-// for update profile
-const updateProfile = catchAsyncError(async (req, res, next) =>{
+const updateProfile = catchAsyncError(async (req, res, next) => {
   const allowedFields = [
-    "name", "phone", "gender", "dob", "address", "location_coordinates",
+    "name", "phone", "gender", "dob",
+     "address.street", "address.state", "address.city", "address.postalCode",
+    "location_coordinates",
   ];
+
   const filteredData = {};
-  allowedFields.forEach((field)=>{
-    if(req.body[field] !== undefined){
-      filteredData[field] = req.body[field]
+  const getNestedValue = (obj, path) =>
+    path.split('.').reduce((o, key) => (o && o[key] !== undefined) ? o[key] : undefined, obj);
+
+  allowedFields.forEach((field) => {
+    const value = getNestedValue(req.body, field);
+    if (value !== undefined) {
+      filteredData[field] = value;
     }
   });
 
-const data = await updateCustomerProfile(filteredData, req.customer._id);
-if(!data.success) return res.status(400).json(data);
-return res.status(200).json(data);
+ const data = await updateCustomerProfile(filteredData, req.customer._id);
+  if (!data.success) return res.status(400).json(data);
+  return res.status(200).json(data);
 });
+
 
 
 

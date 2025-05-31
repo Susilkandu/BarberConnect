@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { toast } from "react-hot-toast";
 import { FaUser, FaEnvelope, FaLock, FaCheckCircle } from "react-icons/fa";
-import { authServices } from "../../../services/customer/index";
+import { customerServices } from "../../../services/customer/index";
 import requestHandler from "../../../utils/requestHandler";
 
 const CustomerSignupForm = () => {
@@ -25,7 +25,7 @@ const CustomerSignupForm = () => {
       (async () => {
         await requestHandler(
           dispatch,
-          () => authServices.getRegistrationStep(),
+          () => customerServices.getRegistrationStep(),
           {
             onSuccess: (res) => {
               setFormData((prev) => ({ ...prev, step: res.data.data.step }));
@@ -76,7 +76,7 @@ const CustomerSignupForm = () => {
           }
           await requestHandler(
             dispatch,
-            () => authServices.sendOtpOnEmai({ email }),
+            () => customerServices.sendOtpOnEmailForReg({ email }),
             {
               onSuccess: (res) => {
                 setFormData((prev) => ({ ...prev, step: 1.1 }));
@@ -92,7 +92,7 @@ const CustomerSignupForm = () => {
           }
           await requestHandler(
             dispatch,
-            () => authServices.verifyOtpForReg({ email, otp }),
+            () => customerServices.verifyOtpForReg({ email, otp }),
             {
               onSuccess: (res) => {
                 setFormData((prev) => ({ ...prev, step: 2 }));
@@ -116,7 +116,7 @@ const CustomerSignupForm = () => {
           }
           await requestHandler(
             dispatch,
-            () => authServices.saveBasicInfoForReg({ name, gender, phone }),
+            () => customerServices.SaveBasicInfoForReg({ name, gender, phone }),
             {
               onSuccess: (res) => {
                 setFormData((prev) => ({ ...prev, step: 3 }));
@@ -133,7 +133,7 @@ const CustomerSignupForm = () => {
           await requestHandler(
             dispatch,
             () =>
-              authServices.saveDobPsdAndLctForReg({
+              customerServices.saveDobPsdAndLctForReg({
                 dob,
                 password,
                 location_coordinates,
@@ -203,6 +203,9 @@ const CustomerSignupForm = () => {
                 className="w-full py-3 bg-transparent outline-none text-gray-800 placeholder:text-gray-400 rounded-r-xl"
               />
             </div>
+            {formData.step==1.1 && <button type="submit" onClick={()=>{
+              setFormData((prev)=>({...prev, step:1.0}))
+            }} className="float-right text-blue-500 cursor-pointer">Resend OTP</button>}
           </div>
         </>
       )}

@@ -4,6 +4,7 @@ import { useNavigate} from "react-router-dom";
 import toast from "react-hot-toast";
 import requiestHandler from "../../../utils/requestHandler";
 import barberService from "../../../services/barber/barberServices";
+import { authServices as customerAuthServices} from "../../../services/customer";
 
 const ResetPassword = () => {
   const dispatch = useDispatch();
@@ -45,8 +46,13 @@ const ResetPassword = () => {
           onSuccess: (res) => {
             setData((prev) => ({ ...prev, otpSent: true }));
           },
+        });
+    }else if (data.role === "customer"){
+      await requiestHandler(dispatch, ()=> customerAuthServices.sendOtpToResetPsd({email: data.email}),{
+        onSuccess: (res) =>{
+          setData((prev)=> ({ ...prev, otpSent: true}));
         }
-      );
+      });
     }
   };
 
@@ -76,6 +82,13 @@ const ResetPassword = () => {
           }
         }
       );
+    }else if( data.role == "customer"){
+      await requiestHandler(dispatch, () => customerAuthServices.verifyOtpAndUpdatePass({email:data.email, eOtp:data.eOtp, password: data.newPassword}),
+      {
+        onSuccess: (res)=>{
+          handleInputChange('done','done');
+        }
+      });
     }
   };
 
@@ -98,9 +111,7 @@ const ResetPassword = () => {
           >
             <option value="">Choose</option>
             <option value="barber">Barber</option>
-            <option value="user" disabled>
-              User (Coming Soon)
-            </option>
+            <option value="customer">Customer</option>
           </select>
         </div>
 

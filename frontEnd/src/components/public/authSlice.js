@@ -3,12 +3,16 @@ import Cookies from 'js-cookie';
 const initialState = {
     role: 'public',
     isAuthenticated: false,
-    loading: false
+    loading: false,
+    liveLocation: []
 }
 const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers:{
+        setLiveLocation: (state, action) =>{
+            state.liveLocation = action.payload
+        },
         loginSuccess:(state, action) =>{
             state.role = action.payload.role;
             state.isAuthenticated = action.payload.isAuthenticated;
@@ -25,5 +29,5 @@ const authSlice = createSlice({
         },
     }
 });
-export const {loginSuccess, logout, setLoading} = authSlice.actions;
+export const {setLiveLocation, loginSuccess, logout, setLoading} = authSlice.actions;
 export default authSlice.reducer;

@@ -8,7 +8,7 @@ import { toggleSidebar, setProfile } from './barberSlice';
 
 import barberServices from '../../services/barber/barberServices';
 import ErrorBoundary from '../common/ErrorBoundary';
-import toast from 'react-hot-toast';
+import requiestHandler from '../../utils/requestHandler';
 import { setLoading, logout } from '../public/authSlice';
 
 
@@ -18,18 +18,12 @@ export default function BarberLayout() {
 
   useEffect(()=>{
     (async()=>{
-      try{
-        dispatch(setLoading({loading:true}));
-        const res = await barberServices.getProfile();
-        console.log(res);
-        dispatch(setProfile({profile:res.data[0]}));
-      }
-      catch(error){
-        toast.error("some error occured");
-        console.log(error);
-      }finally{
-        dispatch(setLoading({loading:false}));
-      }
+      await requiestHandler(dispatch, ()=> barberServices.getProfile(),{
+        onSuccess: (res)=>{
+          console.log(res.data.data[0])
+          dispatch(setProfile({profile:res.data.data[0]}));
+        }
+      })
     })();
   },[]);
   const logOutBarber = async()=>{

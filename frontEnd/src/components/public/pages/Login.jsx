@@ -9,7 +9,7 @@ import requestHandler from '../../../utils/requestHandler';
 
 
 import barberService from '../../../services/barber/barberServices';
-import {authServices as customerAuthService}  from '../../../services/customer/index';
+import {authServices as customerAuthServices}  from '../../../services/customer/index';
 const Login = () => { 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -32,9 +32,10 @@ const Login = () => {
         })
       }
       if(role=='customer'){
-        await requestHandler(dispatch, ()=> customerAuthService.login({email, password}),{
+        await requestHandler(dispatch, ()=> customerAuthServices.login({email, password}),{
           onSuccess: (res) =>{
             dispatch(loginSuccess({role: 'customer', isAuthenticated: true}));
+            navigate("/customer");
           }
         });
       }

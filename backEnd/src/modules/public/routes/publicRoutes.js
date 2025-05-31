@@ -5,7 +5,7 @@ const logError = require("../../../core/middlewares/errors/logError");
 const {validateFilters} = require('../validators/publicValidators');
 
 // controller 
-const {getAllBarbers} = require("../controller/publicController");
+const {getAllBarbers, viewBarberProfile} = require("../controller/publicController");
 
 
 // validator runner
@@ -13,6 +13,7 @@ const {getAllBarbers} = require("../controller/publicController");
 const {runValidation } = require("../../../core/middlewares/validation/validateRequest");
 try{
 router.get('/barbers', validateFilters, runValidation, getAllBarbers);
+router.get('/viewBarberProfile',viewBarberProfile);
 }
 catch(error){
 logError(error);

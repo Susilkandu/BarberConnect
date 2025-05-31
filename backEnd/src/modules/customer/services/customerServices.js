@@ -17,9 +17,13 @@ const sendOtpOnEmailForCustomer = async (email) =>{
   //generating otp
   const otp  = generateOtp();
   const expireIn = new Date(Date.now() + 5*60*1000);
-
+  let data;
+  if(!existingCustomer){
   //inserting new document
-  const data = await Customer.insertOne({email:email, otp: otp, otp_expiry:expireIn, location_coordinates:{type:"Point", coordinates:[0,0]}, profile_completion:1.1});
+  data = await Customer.create({email:email, otp: otp, otp_expiry:expireIn, location_coordinates:{type:"Point", coordinates:[0,0]}, profile_completion:1.1});
+  }else{
+  data = await Customer.findOneAndUpdate({email:email},{$set:{otp: otp, otp_expiry:expireIn, location_coordinates:{type:"Point", coordinates:[0,0]}, profile_completion:1.1}},{$new:true});
+  }
   const {_id} = data;
   if(!_id) return {success: false, message: "Please Try Again Later"};
   const html = generateOTPEmailHtml(otp);
@@ -112,7 +116,7 @@ const updatePassword = async(email, eOtp, password) =>{
 
 // For fetch profile information
 const fetchProfile = async(customer_id)=>{
-  const data = await Customer.find({_id:customer_id}).select('-password -otp -otp_expiry');
+  const data = await Customer.find({_id:customer_id}).select('name email phone gender dob profileImage address ');
   if(!data) return {success: false, message: "Your Data Not Found"};
   return {success: true, message: "Fetched Profile", data:data};
 }
@@ -122,11 +126,11 @@ const uploadNewProfilePhoto = async(newFileName,customer_id)=>{
   // Update the user's profile in the database
   const updatedCustomer = await Customer.findByIdAndUpdate(customer_id, {
     $set:{
-      'profile_image':newFileName,
+      'profileImage':newFileName,
       updatedAt:Date.now()
     }
   });
-  const oldFileName = updatedCustomer.profile_image;
+  const oldFileName = updatedCustomer.profileImage;
   // deleting the previous profile photo)
   if(oldFileName){
     deleteFile(path.join(__dirname + "../../../../../../files/" + oldFileName));
@@ -137,23 +141,9 @@ const uploadNewProfilePhoto = async(newFileName,customer_id)=>{
 
 // For update customer Profile Details
 const updateCustomerProfile = async(filteredData, customer_id)=>{
-  const updatedCustomer = await Customer.findByIdAndUpdate(customer_id,
-    {
-      $set:filteredData,
-    }, {new: true}
-  );
+  const updatedCustomer = await Customer.findByIdAndUpdate(customer_id,{$set:filteredData});
   if(!updatedCustomer) return {success: false, message: "Please Try Again Later Some Error occured"};
-  const {
-    name,
-    phone,
-    gender,
-    dob,
-    address,
-    location_coordinates
-  } = updatedCustomer;
-  return {success: true, message: "Profile updated successfully",
-    data: {name, phone, gender, dob, address, location_coordinates}
-  }
+  return {success: true, message: "Profile updated successfully"}
 }
 
 

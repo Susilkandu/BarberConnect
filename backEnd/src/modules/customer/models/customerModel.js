@@ -37,7 +37,7 @@ const customerSchema = new mongoose.Schema({
   isBlocked: { type: Boolean, default: false },
   otp: {type: String},
   otp_expiry:{type: Date},
-  isVerified:{Type: Boolean},
+  isVerified:{type: Boolean, default: false},
   profile_completion: { type: Number, default: 1 },
 }, { timestamps: true });
 

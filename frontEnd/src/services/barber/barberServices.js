@@ -8,13 +8,13 @@ const barberService = {
   // 1️⃣ Register basic info (Step 1)
   registerBasicInfo: async ({ name, email, phone, password }) => {
     const res = await API.post('/business/register', { name, email, phone, password });
-    return res.data; // expect { token, ... }
+    return res;
   },
 
   // 2️⃣ Verify email via OTP (Step 2)
   verifyEmailOtp: async (eOtp) => {
     const res = await API.post('/business/verifyEmailViaOtp', { eOtp });
-    return res.data;
+    return res;
   },
 
   // 3️⃣ Add business details (Step 3)
@@ -28,19 +28,19 @@ const barberService = {
       },
     };
     const res = await API.put('/business/addDetails', payload);
-    return res.data;
+    return res;
   },
 
   // 4️⃣ Add services offered (Step 4)
   addBusinessServices: async ({ services_offered, average_price_range }) => {
     const res = await API.put('/business/addServices', { services_offered, average_price_range });
-    return res.data;
+    return res;
   },
 
   // 5️⃣ Add profile details (Step 5)
   addProfileDetails: async ({ bio, experience, social_links }) => {
     const res = await API.put('/business/addProfile', { bio, experience, social_links });
-    return res.data;
+    return res;
   },
 
   // 6️⃣ Add payment details (Step 6)
@@ -66,7 +66,7 @@ const barberService = {
   },
   getProfile: async () => {
     const res = await API.get('/business/myProfile');
-    return res.data;
+    return res;
   },
   changeProfilePhoto: async (photoFile) => {
     const formData = new FormData();
@@ -76,7 +76,7 @@ const barberService = {
         'Content-Type':'multipart/form-data',
       }
     });
-    return res.data;
+    return res;
   } 
   
 };
