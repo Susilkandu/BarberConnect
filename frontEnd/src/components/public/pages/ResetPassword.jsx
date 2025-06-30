@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate} from "react-router-dom";
 import toast from "react-hot-toast";
 import requiestHandler from "../../../utils/requestHandler";
-import barberService from "../../../services/barber/barberServices";
+import salonServices from "../../../services/salon/salonServices";
 import { authServices as customerAuthServices} from "../../../services/customer";
 
 const ResetPassword = () => {
@@ -38,10 +38,10 @@ const ResetPassword = () => {
       return;
     }
 
-    if (data.role === "barber") {
+    if (data.role === "salon") {
       await requiestHandler(
         dispatch,
-        () => barberService.sendOtpToResetPsd({ email: data.email }),
+        () => salonServices.sendOtpToResetPsd({ email: data.email }),
         {
           onSuccess: (res) => {
             setData((prev) => ({ ...prev, otpSent: true }));
@@ -70,9 +70,9 @@ const ResetPassword = () => {
       return;
     }
 
-    if (data.role === "barber") {
+    if (data.role === "salon") {
       await requiestHandler(dispatch, () =>
-        barberService.verifyOtpAndUpdatePass({
+        salonServices.verifyOtpAndUpdatePass({
           email: data.email,
           eOtp: data.eOtp,
           password: data.newPassword,
@@ -110,7 +110,7 @@ const ResetPassword = () => {
             onChange={(e) => handleInputChange("role", e.target.value)}
           >
             <option value="">Choose</option>
-            <option value="barber">Barber</option>
+            <option value="salon">Salon</option>
             <option value="customer">Customer</option>
           </select>
         </div>
@@ -124,7 +124,7 @@ const ResetPassword = () => {
             <input
               type="email"
               className="w-full px-4 py-2 border rounded-lg bg-[#F9FAFB] border-[#E5E7EB] text-[#111827] focus:ring-2 focus:ring-[#FFD369]"
-              placeholder="barber@example.com"
+              placeholder="Enter Email Address"
               value={data.email}
               onChange={(e) => handleInputChange("email", e.target.value)}
             />

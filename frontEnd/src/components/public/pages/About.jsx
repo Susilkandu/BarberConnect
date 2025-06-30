@@ -8,12 +8,14 @@ import {
     useMotionValue,
     useTransform,
 } from "motion/react"
+import {useSelector} from "react-redux";
 
 const About = () => {
   const [pathIndex, setPathIndex] = useState(0)
     const progress = useMotionValue(pathIndex)
     const fill = useTransform(progress, paths.map(getIndex), colors)
     const path = useFlubber(progress, paths)
+    const brandName = useSelector(state => state.auth.brandName); 
 
      useEffect(() => {
         const animation = animate(progress, pathIndex, {
@@ -56,14 +58,14 @@ const About = () => {
         <div className="bg-[#1F2937] p-6 rounded-2xl shadow-lg">
           <h2 className="text-2xl font-semibold mb-2">🧬 Our Essence</h2>
           <p className="text-gray-300">
-            Imagine a barber shop in a small town, and a customer walking in — not just for a haircut, but to feel seen. BarberConnect was born from that exact feeling — to bring connection, dignity, and digital power to every chair, every scissor, every hand that crafts beauty.
+            Imagine a barber shop in a small town, and a customer walking in — not just for a haircut, but to feel seen. ${brandName} was born from that exact feeling — to bring connection, dignity, and digital power to every chair, every scissor, every hand that crafts beauty.
           </p>
         </div>
 
         <div className="bg-[#1F2937] p-6 rounded-2xl shadow-lg">
           <h2 className="text-2xl font-semibold mb-2">🔗 Why We Exist</h2>
           <p className="text-gray-300">
-            We exist to make discovery easier for customers, and to give barbers the stage they deserve. Whether you run a tiny shop in a hidden gali or a premium urban studio, BarberConnect is your space to shine.
+            We exist to make discovery easier for customers, and to give barbers the stage they deserve. Whether you run a tiny shop in a hidden gali or a premium urban studio, ${brandName} is your space to shine.
           </p>
         </div>
          <svg width="400" height="400">

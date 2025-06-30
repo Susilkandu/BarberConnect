@@ -11,7 +11,7 @@ export default function Profile() {
   const profile = useSelector((state) => state.customer.profile);
   const handleChangeProfileImage = async (e)=>{
     const newProfilePhoto = e.target.files[0];
-    await requestHandler(dispatch, () => profileServices.changeProfilePhoto(newProfilePhoto),{
+    await requestHandler(dispatch, () => profileServices.changeProfilePhoto(newProfilePhoto),1,{
       onSuccess: (res)=>{
         const newProfileImage = res.data.data.newProfileLink;
         dispatch(setProfile({...profile, profileImage:newProfileImage}));
@@ -19,7 +19,8 @@ export default function Profile() {
     })
   }
   const handleUpdate = async (data) => {
-    await requestHandler(dispatch, () => profileServices.updateProfile(data), {
+    await requestHandler(dispatch, () => profileServices.updateProfile(data),1,
+     {
       onSuccess: (res) => {
         console.log(data)
         if(data.address){

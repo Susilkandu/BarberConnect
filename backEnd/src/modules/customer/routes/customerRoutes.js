@@ -11,8 +11,10 @@ const {validateEmail, validateVerificationDetails, validateBasicInfo, validateDo
 } = require("../validators/customerValidator");
 
 //controller
-const {sendOtpOnEmailForReg,resendOtpOnEmailForReg, getRegistrationStep, verifyOtpForReg, saveBasicInfoFoReg, saveDobPsdAndLctnForReg, loginViaCredential, sendOtpToResetPsd,
-    verifyOtpAndUpdatePass, getProfile, changeProfilePhoto, updateProfile
+const {sendOtpOnEmailForReg, getRegistrationStep, verifyOtpForReg, saveBasicInfoFoReg, saveDobPsdAndLctnForReg, loginViaCredential, sendOtpToResetPsd,
+    verifyOtpAndUpdatePass, getProfile, changeProfilePhoto, updateProfile,
+    getBookingHistory,
+    getBookingDetails
 } = require("../controller/customerController");
 
 // validator runner
@@ -32,6 +34,8 @@ try {
     router.get('/myProfile', requireCustomerLogin, getProfile);
     router.post('/changeProfilePhoto', requireCustomerLogin, uploadPhoto.single('profilePhoto'), changeProfilePhoto);
     router.patch('/updateProfile',requireCustomerLogin, checkEmptyBody, validateUpdateProfileFields, runValidation, updateProfile);
+    router.get('/getBookingHistory', requireCustomerLogin, getBookingHistory);
+    router.get('/getBookingDetails/:bookingId',requireCustomerLogin, getBookingDetails);
 } catch (error) {
  logError(error);
 }

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Outlet, Link } from 'react-router-dom';
-import { FaBars, FaRegClock } from 'react-icons/fa';
-import { RiDashboard3Fill, RiLogoutBoxRLine } from "react-icons/ri";
+import { FaBars, FaPaintBrush } from 'react-icons/fa';
+import { RiLogoutBoxRLine } from "react-icons/ri";
 import { IoPerson } from "react-icons/io5";
 import { useSelector, useDispatch } from 'react-redux';
 import { toggleSidebar, setProfile } from './customerSlice';
@@ -10,6 +10,7 @@ import profileServices from '../../services/customer/profileService';
 import ErrorBoundary from '../common/ErrorBoundary';
 import toast from 'react-hot-toast';
 import { setLoading, logout } from '../public/authSlice';
+import { MdOutlineHistory } from 'react-icons/md';
 
 
 export default function CustomerLayout() {
@@ -67,11 +68,12 @@ export default function CustomerLayout() {
         >
           <div className="p-6 space-y-6">
             <nav className="space-y-4">
-              <Link to="/customer/dashboard" className="flex items-center gap-3 text-lg hover:bg-gray-700 px-4 py-2 rounded transition">
-                <RiDashboard3Fill className="text-xl" /> Home
+
+              <Link to="/customer" className="flex items-center gap-3 text-lg hover:bg-gray-700 px-4 py-2 rounded transition">
+                <FaPaintBrush className="text-xl" /> Home
               </Link>
-              <Link to="/customer/schedule" className="flex items-center gap-3 text-lg text-green-500 hover:bg-gray-700 px-4 py-2 rounded transition">
-                <FaRegClock className="text-xl" />Schedule
+              <Link to="/customer/bookingHistory" className="flex items-center gap-3 text-lg hover:bg-gray-700 px-4 py-2 rounded transition">
+                <MdOutlineHistory className="text-xl" /> Booking History
               </Link>
             </nav>
           </div>

@@ -1,7 +1,7 @@
 const logError = require('./src/core/middlewares/errors/logError');
 process.on('uncaughtException',(err)=>{
-    console.log('Uncaught Exception :', err.message);
-    logError(err.message);
+    console.log('Uncaught Exception :', err);
+    logError(err);
 })
 process.on('unhandledRejection',(promise)=>{
     console.error(`‼ Unhandled Rejection at:`, promise);

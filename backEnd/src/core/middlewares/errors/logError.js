@@ -4,7 +4,7 @@ const logError = (message) => {
     const logFilePath = path.join("../", "server.log");
     const timestamp = new Date().toLocaleString();
     let logMessage;
-    if (message.stack) {
+    if (message?.stack) {
       logMessage = `[${timestamp}] ${message.stack} \n`;
     } else {
       logMessage = `[${timestamp}] ${message} \n`;

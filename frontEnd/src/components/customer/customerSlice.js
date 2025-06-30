@@ -16,6 +16,7 @@ const customerSlice  = createSlice({
         clearProfile: (state) =>{
             state.profile = null;
         },
+
     },
 });
 export const {toggleSidebar, setProfile, clearProfile} = customerSlice.actions;

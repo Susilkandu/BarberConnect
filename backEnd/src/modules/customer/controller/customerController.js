@@ -3,6 +3,8 @@ const catchAsyncError = require("../../../core/middlewares/errors/catchAsyncErro
 
 const {sendOtpOnEmailForCustomer, resenOtpForCustomer, verifyOtpForCustomer, saveNameGenderPhone, saveDobPsdLctn, login, sendOtpToEmailForResetPsd,
   updatePassword, fetchProfile, uploadNewProfilePhoto, updateCustomerProfile,
+  fetchBookingHistory,
+  fetchBookingDetails,
 } = require("../services/customerServices");
 
 // controller for sending otp on the email for registration
@@ -11,7 +13,6 @@ const sendOtpOnEmailForReg = catchAsyncError(async(req, res, next)=>{
   const data = await sendOtpOnEmailForCustomer(email);
   if(!data.success) return res.status(400).json(data);
   return res.status(200).json(data);
-
 });
 
 //controller for verifying the otp that is sent on the email for registration and sending a token
@@ -141,8 +142,25 @@ const updateProfile = catchAsyncError(async (req, res, next) => {
   return res.status(200).json(data);
 });
 
+// for getting Booking History
+const getBookingHistory = catchAsyncError(async (req, res, next) =>{
+const data = await fetchBookingHistory(req.customer._id);
+if(!data.success){
+  return res.status(400).json(data);
+  }
+return res.status(200).json(data);
+});
 
-
+// for getting Booking details
+const getBookingDetails = catchAsyncError(async(req, res, next)=>{
+  const {bookingId} = req.params;
+  const customer_id = req.customer._id;
+  const data = await fetchBookingDetails(customer_id, bookingId);
+  if(!data.success){
+  return res.status(400).json(data);
+    }
+  return res.status(200).json(data);
+})
 
 module.exports = {
 sendOtpOnEmailForReg,
@@ -155,5 +173,7 @@ sendOtpToResetPsd,
 verifyOtpAndUpdatePass,
 getProfile,
 changeProfilePhoto,
-updateProfile
+updateProfile,
+getBookingHistory, 
+getBookingDetails
 }

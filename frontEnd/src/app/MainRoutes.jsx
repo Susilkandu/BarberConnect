@@ -1,21 +1,21 @@
 import {Routes, Route} from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import barberService from "../services/barber/barberServices";
+import salonServices from "../services/salon/salonServices";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { loginSuccess, setLoading } from "../components/public/authSlice";
-import { setProfile } from "../components/barber/barberSlice";
+import { setProfile } from "../components/salon/salonSlice";
 import Cookies from 'js-cookie';
 //Layouts
 import PulicLayout from '../components/public/PublicLayout';
 import CustomerLayout from '../components/customer/CustomerLayout';
 import AdminLayout from '../components/admin/AdminLayout';
-import BarberLayout from '../components/barber/BarberLayout';
+import SalonLayout from '../components/salon/SalonLayout';
 
 //Route groups
 import publicRoutes from '../components/public/routes/publicRoutes';
-import barberRoutes from '../components/barber/routes/BarberRoute';
+import salonRoutes from '../components/salon/routes/SalonRoutes';
 import customerRoutes from '../components/customer/routes/CustomerRoute';
 // import adminRoutes from '../components/admin/routes/AdminRoute';
 
@@ -33,16 +33,16 @@ export default function MainRoutes() {
   useEffect(()=>{
    ; (async()=>{
       try {
-        if(Cookies.get('businessToken')){
+        if(Cookies.get('salonToken')){
           dispatch(setLoading({loading:true}));
-          const res = await barberService.getProfile();
-          dispatch(loginSuccess({role:"barber",isAuthenticated:true}));
+          const res = await salonServices.getProfile();
+          dispatch(loginSuccess({role:"salon",isAuthenticated:true}));
           dispatch(setProfile(res.data.data[0]));
-          navigate('/barber');
+          navigate('/salon');
         }
         if(Cookies.get('customerToken')){
           dispatch(setLoading({loading:true}));
-          // const res = await barberService.getProfile();
+          // const res = await salonServices.getProfile();
           dispatch(loginSuccess({role:"customer",isAuthenticated:true}));
           // dispatch(setProfile(res.data[0]));
           navigate('/customer');
@@ -77,13 +77,13 @@ export default function MainRoutes() {
           ))
         }
       </Route>
-      <Route path="/barber/*" element={
-        <PrivateRoute requiredRole="barber">
-          <BarberLayout/>
+      <Route path="/salon/*" element={
+        <PrivateRoute requiredRole="salon">
+          <SalonLayout/>
         </PrivateRoute>
       }>
         {
-          barberRoutes.map(({path, element}, index) => (
+          salonRoutes.map(({path, element}, index) => (
             <Route key={index} path={path} element={element} />
           ))
         }

@@ -1,6 +1,7 @@
 import {createSlice} from '@reduxjs/toolkit'
 import Cookies from 'js-cookie';
 const initialState = {
+    brandName:"Celestia",
     role: 'public',
     isAuthenticated: false,
     loading: false,
@@ -20,7 +21,7 @@ const authSlice = createSlice({
         logout:(state) =>{
             state.role = 'public';
             state.isAuthenticated = false;
-            Cookies.remove('businessToken');
+            Cookies.remove('salonToken');
             Cookies.remove('customerToken');
             Cookies.remove('adminToken');
         },

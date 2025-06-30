@@ -1,12 +1,12 @@
 import { toast } from 'react-hot-toast'
 import { setLoading } from "../components/public/authSlice";
 
-const requiestHandler = async (dispatch, fn, { onSuccess, onError } = {}) => {
+const requestHandler = async (dispatch, fn, showAck=0, { onSuccess, onError } = {}) => {
   try {
   dispatch(setLoading({ loading: true }));
   const res = await fn();
     if (res?.data?.success) {
-      toast.success(res?.data?.message || "Success");
+      if(showAck)toast.success(res?.data?.message || "Success");
       if (onSuccess) onSuccess(res);
     } else {
       toast.error(res?.data?.message || "Something went wrong.");
@@ -32,4 +32,4 @@ const requiestHandler = async (dispatch, fn, { onSuccess, onError } = {}) => {
   }
 };
 
-export default requiestHandler;
+export default requestHandler;

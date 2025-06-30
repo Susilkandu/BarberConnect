@@ -13,7 +13,7 @@ API.interceptors.response.use(
   res => res,
   err => {
     if (err.response?.status === 401) {
-        Cookies.remove('businessToken');
+        Cookies.remove('salonToken');
     }
     return Promise.reject(err);
   }

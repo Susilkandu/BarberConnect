@@ -1,6 +1,6 @@
 import { useState } from "react";
-import CustomerSignupForm from "./CustomerSignupForm";
-import BarberSignUpForm from "./BarberSignUpForm";
+import CustomerSignupForm from "../subComponents/CustomerSignupForm";
+import SalonSignUpForm from "../subComponents/SalonSignUpForm";
 
 const SignupPage = () => {
   const [role, setRole] = useState("customer");
@@ -23,19 +23,19 @@ const SignupPage = () => {
             Customer
           </button>
           <button
-            onClick={() => setRole("barber")}
+            onClick={() => setRole("salon")}
             className={`px-4 py-2 rounded-md font-semibold cursor-pointer ${
-              role === "barber"
+              role === "salon"
                 ? "bg-[#FFD369] text-[#111827]"
                 : "bg-[#E5E7EB] text-[#374151]"
             }`}
           >
-            Barber
+            Salon
           </button>
         </div>
 
         {/* Conditional Render */}
-        {role === "customer" ? <CustomerSignupForm /> : <BarberSignUpForm />}
+        {role === "customer" ? <CustomerSignupForm /> : <SalonSignUpForm />}
       </div>
     </div>
   );

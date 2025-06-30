@@ -1,12 +1,12 @@
 const { query, validationResult } = require('express-validator');
 
 const validateFilters = [
-  query('business_name')
+  query('salon_name')
     .optional()
     .isString()
     .trim()
     .withMessage('Shop name must be String'),
-  query('location')
+  query('full_address')
     .optional()
     .isString()
     .trim()

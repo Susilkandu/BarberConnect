@@ -1,12 +1,11 @@
+const { ObjectId } = require("mongodb");
+const Salon = require("../../salon/models/salonModel");
 
-const {ObjectId} = require("mongodb");
-const Business = require("../../business/models/businessModel");
-
-const fetchAllBarbers = async (query) => {
+const fetchAllSalons = async (query) => {
   try {
     let {
-      business_name,
-      location,
+      salon_name,
+      full_address,
       longitude,
       latitude,
       sortBy,
@@ -15,7 +14,8 @@ const fetchAllBarbers = async (query) => {
       page = 1,
       limit = 10,
     } = query;
-
+    minPrice = parseInt(minPrice);
+    maxPrice = parseInt(maxPrice);
     // Sanitize inputs
     [page, limit] = [Math.max(+page || 1, 1), Math.max(+limit || 10, 1)];
 
@@ -37,15 +37,17 @@ const fetchAllBarbers = async (query) => {
       });
     }
 
-    if (business_name)
-      match.business_name = { $regex: business_name, $options: "i" };
-    if (location) match.location = { $regex: location, $options: "i" };
-    if (!isNaN(minPrice)) match["average_price_range.min"] = { $gte: minPrice };
-    if (!isNaN(maxPrice))
-      match["average_price_range.max"] = {
-        ...match["average_price_range.max"],
-        $lte: maxPrice,
-      };
+    if (salon_name) match.salon_name = { $regex: salon_name, $options: "i" };
+    if (full_address)
+      match.full_address = { $regex: full_address, $options: "i" };
+    if (minPrice && maxPrice) {
+      match["average_price_range.min"] = { $gte: +minPrice };
+      match["average_price_range.max"] = { $lte: +maxPrice };
+    } else if (minPrice) {
+      match["average_price_range.min"] = { $gte: +minPrice };
+    } else if (maxPrice) {
+      match["average_price_range.max"] = { $lte: +maxPrice };
+    }
 
     if (Object.keys(match).length) pipeline.push({ $match: match });
 
@@ -61,8 +63,8 @@ const fetchAllBarbers = async (query) => {
     pipeline.push({
       $project: {
         _id: 1,
-        business_name: 1,
-        profile_image:1,
+        salon_name: 1,
+        profile_image: 1,
         rating: 1,
         services_offered: 1,
         average_price_range: 1,
@@ -70,12 +72,12 @@ const fetchAllBarbers = async (query) => {
       },
     });
 
-    const [rawBarbers, totalCount] = await Promise.all([
-      Business.aggregate(pipeline),
-      Business.countDocuments(match),
+    const [rawSalons, totalCount] = await Promise.all([
+      Salon.aggregate(pipeline),
+      Salon.countDocuments(match),
     ]);
 
-    const barbers = rawBarbers.map((b) => {
+    const salons = rawSalons.map((b) => {
       const obj = b.toObject?.() || b;
       const d = obj.distance;
       const formattedDistance =
@@ -90,7 +92,7 @@ const fetchAllBarbers = async (query) => {
     return {
       success: true,
       message: "Fetched",
-      barbers,
+      salons,
       pagination: {
         total: totalCount,
         currentPage: page,
@@ -105,31 +107,122 @@ const fetchAllBarbers = async (query) => {
       error: error.message,
     };
   }
-  };
-const fetchBarberDetails = async (business_id) => {
-  console.log(business_id)
-  business_id = new ObjectId(business_id);
-   const projectionFields = {
-    business_name: 1,
-    bio: 1,
-    profilePhoto: 1,          // make sure this field name matches schema (profile_image vs profilePhoto)
-    photos: 1,
-    location: 1,
-    location_coordinates: 1,
-    social_links: 1,
-    services_offered: 1,
-    rating: 1,
-    verified_by_admin: 1,
-    trust_score: 1,
-    experience: 1,
-    slot_booking_enabled: 1,
-  };
-  const data = await Business.findById(business_id, projectionFields);
-  if (!data) return { success: false, message: "Barber Details Not Found" };
-  return { success: true, message: "Fetched", data };
+};
+const fetchSalonDetails = async (salon_id) => {
+  try {
+    salon_id = new ObjectId(salon_id);
+
+    const data = await Salon.aggregate([
+      { $match: { _id: salon_id } },
+      {
+        $lookup: {
+          from: "salonservices",
+          let: { salonId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$salon_id", "$$salonId"] },
+                isDeleted: { $ne: true }
+              }
+            },
+            {
+              $lookup: {
+                from: "masterservices",
+                localField: "service_id",
+                foreignField: "_id",
+                as: "serviceDetails"
+              }
+            },
+            { $unwind: "$serviceDetails" }
+          ],
+          as: "services"
+        }
+      },
+      {
+        $project: {
+          salon_name: 1,
+          bio: 1,
+          profile_image: 1,
+          banner: 1,
+          photos: 1,
+          full_address: 1,
+          location_coordinates: 1,
+          operating_hours: 1,
+          social_links: 1,
+          rating: 1,
+          rating_count: 1,
+          verified_by_admin: 1,
+          trust_score: 1,
+          experience: 1,
+          slot_configuration: 1,
+          booking_settings: 1,
+          average_price_range: 1,
+          services: {
+            _id: 1,
+            price: 1,
+            estimated_duration: 1,
+            gender: 1,
+            serviceDetails: {
+              _id: 1,
+              name: 1,
+              description: 1,
+              category: 1
+            }
+          },
+          owner_name: 1,
+          is_verified: 1,
+          status: 1,
+          unavailable_dates: 1
+        }
+      }
+    ]);
+
+    if (!data || data.length === 0) {
+      return { success: false, message: "Salon Details Not Found" };
+    }
+
+    // Convert operating_hours Map to a plain object
+    const salonData = data[0];
+    const operatingHours = {};
+    
+    if (salonData.operating_hours instanceof Map) {
+      salonData.operating_hours.forEach((value, key) => {
+        operatingHours[key] = value;
+      });
+    } else {
+      // Handle case where operating_hours is already an object
+      Object.assign(operatingHours, salonData.operating_hours || {});
+    }
+
+    // Format the data for response
+    const formattedData = {
+      ...salonData,
+      operating_hours: Object.entries(operatingHours).map(([day, hours]) => ({
+        day: Number(day),
+        dayName: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][day],
+        opening: hours.opening,
+        closing: hours.closing,
+        is_open: hours.is_open
+      }))
+    };
+
+    return { 
+      success: true, 
+      message: "Fetched Successfully", 
+      data: formattedData 
+    };
+
+  } catch (error) {
+    console.error("Error fetching salon details:", error);
+    return { 
+      success: false, 
+      message: "Error fetching salon details",
+      error: error.message 
+    };
+  }
 };
 
 module.exports = {
-  fetchAllBarbers,
-  fetchBarberDetails,
+  fetchAllSalons,
+  fetchSalonDetails,
 };

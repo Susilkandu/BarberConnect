@@ -1,4 +1,6 @@
+const { ObjectId } = require("mongodb");
 const Customer = require("../models/customerModel");
+const Booking = require("../../booking/models/bookingModel.js");
 const bcrypt = require("bcryptjs");
 const path = require('path');
 const jwt = require('jsonwebtoken');
@@ -145,7 +147,98 @@ const updateCustomerProfile = async(filteredData, customer_id)=>{
   if(!updatedCustomer) return {success: false, message: "Please Try Again Later Some Error occured"};
   return {success: true, message: "Profile updated successfully"}
 }
+// For Fetching Booking History
+const fetchBookingHistory = async(customer_id)=>{
+const history = await Booking.aggregate([
+  { $match: { customer_id: customer_id } },
+  {
+    $lookup: {
+      from: 'salons',
+      localField: 'salon_id',
+      foreignField: '_id',
+      as: 'salon'
+    }
+  },
+  { $unwind: "$salon" },
+  {
+    $project: {
+      _id: 1,
+      salon_name: "$salon.salon_name",
+      total_price: 1,
+      paymentStatus: 1,
+      status: 1,
+      bookingDate: 1,
+      // starting_time_slot: 1
+    }
+  }
+]);
 
+  if(!history) return {success:false, message: "No Booking History"};
+  return {success: true, message:"Fetched", data:history};
+}
+
+// /For getting Details of booking
+const fetchBookingDetails = async (customer_id, booking_id) => {
+  try {
+    booking_id = new ObjectId(booking_id);
+
+    const details = await Booking.aggregate([
+      {
+        $match: { _id: booking_id, customer_id: customer_id }
+      },
+      {
+        $lookup: {
+          from: 'masterservices', // Make sure this matches your service collection name
+          localField: 'required_services.service_id',
+          foreignField: '_id',
+          as: 'servicesInfo'
+        }
+      },
+      {
+        $project: {
+          _id: 1, // hide _id
+          total_price: 1,
+          paymentMode: 1,
+          paymentStatus: 1,
+          status: 1,
+          bookingDate: 1,
+          starting_time_slot: 1,
+          ending_time_slot: 1,
+          services: {
+            $map: {
+              input: '$required_services',
+              as: 'service',
+              in: {
+                price: '$$service.price',
+                estimated_duration: '$$service.estimated_duration',
+                gender: '$$service.gender',
+                service_info: {
+                  $arrayElemAt: [
+                    {
+                      $filter: {
+                        input: '$servicesInfo',
+                        as: 'info',
+                        cond: { $eq: ['$$info._id', '$$service.service_id'] }
+                      }
+                    },
+                    0
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    ]);
+    if (!details || details.length === 0) {
+      return { success: false, message: 'Details Not Found' };
+    }
+    return { success: true, message: 'fetched', data: details[0] };
+  } catch (error) {
+    console.error(error);
+    return { success: false, message: 'Server Error', error };
+  }
+};
 
 module.exports = {
 sendOtpOnEmailForCustomer,
@@ -157,6 +250,8 @@ sendOtpToEmailForResetPsd,
 updatePassword,
 fetchProfile,
 uploadNewProfilePhoto,
-updateCustomerProfile
+updateCustomerProfile,
+fetchBookingHistory,
+fetchBookingDetails
 
 }

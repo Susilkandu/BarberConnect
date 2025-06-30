@@ -19,21 +19,30 @@ const PublicLayout = () => {
         (position) => {
           const { latitude, longitude } = position.coords;
           dispatch(setLiveLocation([longitude, latitude]));
+          dispatch(setLoading({ loading: false }));
         },
         (error) => {
-          console.log(error);
-          if (error.code === 1) {
-            toast.error(
-              "Location permission denied. Please enable location access in your browser settings."
-            );
-            return;
-          }else{
-          toast.error("Unable to get current location");
+          console.log("Geolocation error object:", error);
+          switch(error.code){
+            case error.PERMISSION_DENIED:
+              toast.error("Please Allow location Permission");
+              break;
+            case error.POSITION_UNAVAILABLE:
+              // toast.error("Location information is unvailable.");
+              console.log("Location information is unavailable.")
+              break;
+            case error.TIMEOUT:
+              toast.error("The request to get user location time out");
+              break;
+            default:
+              toast.error("An unknown error occured",error);
+              break;
           }
+          dispatch(setLoading({ loading: false }));
+
         },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       );
-      dispatch(setLoading({ loading: false }));
     };
     handleLocationCoords();
   })();
@@ -43,7 +52,9 @@ const PublicLayout = () => {
     <ErrorBoundary>
     <div>
       <main className="p-2  min-h-[80vh] bg-gray-50">
-  { liveLocation[0] && <ErrorBoundary><Outlet /></ErrorBoundary>}
+  { 
+  // liveLocation[0] &&
+  <ErrorBoundary><Outlet /></ErrorBoundary>}
       </main>
       <Navbar/>
     </div>
